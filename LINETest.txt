@@ -1,0 +1,94 @@
+*** Settings ***
+Library           Parallelization.py
+Library           Mobile.py    FA364PN04183    WITH NAME    Butterfly
+Library           Mobile.py    4d00220d928640b9    WITH NAME    S4
+Library           Mobile.py    HT37TW9A0401    WITH NAME    NewOne
+Library           Mobile.py    FA369W909779    WITH NAME    G2
+
+*** Variables ***
+${sleep}          1550    #1545
+
+*** Test Cases ***
+LINETest_Parallel
+    : FOR    ${i}    IN RANGE    3
+    \    log    ${i}
+    \    ${new_one}    Run Async    Run Keywords    NewOne Shakes    AND    Check NewOne
+    \    ${g2}    Run Async    Run Keywords    G2 Shakes    AND    Check G2
+    \    ${s4}    Run Async    Run Keywords    S4 Shakes    AND    Check S4
+    \    ${butterfly}    Run Async    Run Keywords    Butterfly Shakes    AND    Check Butterfly
+    \    Wait Until    ${g2}    ${new_one}    ${s4}    ${butterfly}
+    \    G2.Sleep    10000
+    \    NewOne.Press Back
+    \    G2.Press Back
+    \    S4.Press Back
+    \    Butterfly.Press Back
+    [Teardown]    Stop All Async Tasks
+
+LINETest_Sequential
+    : FOR    ${i}    IN RANGE    20
+    \    log    i = ${i}
+    \    Sequential
+    \    G2.Sleep    10000
+    \    NewOne.Press Back
+    \    G2.Press Back
+    \    S4.Press Back
+    \    Butterfly.Press Back
+
+*** Keywords ***
+G2 Shakes
+    G2.Click On    textContains=搖動手機
+    G2.Sleep    ${sleep}
+
+NewOne Shakes
+    NewOne.Click On    textContains=搖動手機
+    NewOne.Sleep    ${sleep}
+
+S4 Shakes
+    S4.Click On    textContains=搖動手機
+    S4.Sleep    ${sleep}
+
+Butterfly Shakes
+    Butterfly.Click On    textContains=搖動手機
+    Butterfly.Sleep    ${sleep}
+
+Check G2
+    ${new_one_g2}    G2.Wait For Exists    20000    text=Ivy Liu
+    Run Keyword And Continue On Failure    Should Be True    ${new_one_g2}    NewOne沒出現在G2
+    ${s4_g2}    G2.Wait For Exists    20000    text=小蘋果
+    Run Keyword And Continue On Failure    Should Be True    ${s4_g2}    S4沒出現在G2
+    ${butterfly_g2}    G2.Wait For Exists    20000    text=小綠人
+    Run Keyword And Continue On Failure    Should Be True    ${butterfly_g2}    Butterfly沒出現在G2
+
+Check NewOne
+    ${s4_one}    NewOne.Wait For Exists    20000    text=小蘋果
+    Run Keyword And Continue On Failure    Should Be True    ${s4_one}    S4沒出現在NewOne
+    ${butterfly_one}    NewOne.Wait For Exists    20000    text=小綠人
+    Run Keyword And Continue On Failure    Should Be True    ${butterfly_one}    Butterfly沒出現在NewOne
+    ${G2_one}    NewOne.Wait For Exists    20000    text=autotest5
+    Run Keyword And Continue On Failure    Should Be True    ${G2_one}    G2沒出現在NewOne
+
+Check S4
+    ${butterfly_s4}    S4.Wait For Exists    20000    text=小綠人
+    Run Keyword And Continue On Failure    Should Be True    ${butterfly_s4}    Butterfly沒出現在S4
+    ${G2_s4}    S4.Wait For Exists    20000    text=autotest5
+    Run Keyword And Continue On Failure    Should Be True    ${G2_s4}    G2沒出現在S4
+    ${new_one_s4}    S4.Wait For Exists    20000    text=Ivy Liu
+    Run Keyword And Continue On Failure    Should Be True    ${new_one_s4}    NewOne沒出現在S4
+
+Check Butterfly
+    ${G2_bu}    Butterfly.Wait For Exists    20000    text=autotest5
+    Run Keyword And Continue On Failure    Should Be True    ${G2_bu}    G2沒出現在Butterfly
+    ${new_one_bu}    Butterfly.Wait For Exists    20000    text=Ivy Liu
+    Run Keyword And Continue On Failure    Should Be True    ${new_one_bu}    NewOne沒出現在Butterfly
+    ${s4_bu}    Butterfly.Wait For Exists    20000    text=小蘋果
+    Run Keyword And Continue On Failure    Should Be True    ${s4_bu}    S4沒出現在Butterfly
+
+Sequential
+    NewOne Shakes
+    G2 Shakes
+    S4 Shakes
+    Butterfly Shakes
+    Check NewOne
+    Check G2
+    Check S4
+    Check Butterfly

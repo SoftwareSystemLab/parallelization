@@ -1,0 +1,326 @@
+*** Settings ***
+Resource          Shared Keyword.txt
+
+*** Variables ***
+
+*** Test Cases ***
+WhatsAppTest_Parallel
+    ${message}    Set Variable    WhatsApp傳送訊息
+    ${new_one}    Run Async    Setup WhatsApp on NewOne
+    ${g2}    Run Async    Setup WhatsApp on G2
+    Wait Until    ${new_one}    ${g2}
+    G2 Send a Message to NewOne    ${message}
+    Verify the Message on NewOne    ${message}
+    Clear Messages on NewOne
+    Clear Messages on G2
+    [Teardown]    Stop All Async Tasks
+
+WhatsAppTest_Sequential
+    ${message}    Set Variable    WhatsApp傳送訊息
+    Setup WhatsApp on NewOne
+    Setup WhatsApp on G2
+    G2 Send a Message to NewOne    ${message}
+    Verify the Message on NewOne    ${message}
+    Clear Messages on NewOne
+    Clear Messages on G2
+
+*** Keywords ***
+Install WhatsApp on NewOne
+    NewOne.Wait For Exists    10000    text=Play 商店
+    NewOne.Click On    text=Play 商店
+    NewOne.Wait For Exists    300000    description=搜尋 Google Play
+    NewOne.Click On    description=搜尋 Google Play
+    NewOne.type    WhatsApp
+    NewOne.Press Enter
+    NewOne.Wait For Exists    300000    text=WhatsApp Messenger
+    NewOne.Click On    text=WhatsApp Messenger
+    NewOne.Wait For Exists    300000    text=安裝
+    NewOne.Click On    text=安裝
+    NewOne.Wait For Exists    300000    text=接受
+    NewOne.Click On    text=接受
+    ${uninstall_exist_newone}    NewOne.Wait For Exists    300000    text=解除安裝
+    Should Be True    ${uninstall_exist_newone}
+    NewOne.Press Home
+
+Install WhatsApp on G2
+    G2.Wait For Exists    10000    text=Play 商店
+    G2.Click On    text=Play 商店
+    G2.Wait For Exists    180000    description=搜尋 Google Play
+    G2.Click On    description=搜尋 Google Play
+    G2.type    WhatsApp
+    G2.Press Enter
+    G2.Wait For Exists    180000    text=WhatsApp Messenger
+    G2.Click On    text=WhatsApp Messenger
+    G2.Wait For Exists    180000    text=安裝
+    G2.Click On    text=安裝
+    G2.Wait For Exists    180000    text=接受
+    G2.Click On    text=接受
+    ${uninstall_exist_g2}    G2.Wait For Exists    300000    text=解除安裝
+    Should Be True    ${uninstall_exist_g2}
+    G2.Press Home
+
+Add Contact at NewOne
+    NewOne.Wait For Exists    10000    text=聯絡人
+    NewOne.Click On    text=聯絡人
+    ${confirm_exist_newone}    NewOne.Wait For Exists    5000    text=確定
+    Run Keyword If    ${confirm_exist_newone}    NewOne.Click On    text=確定
+    NewOne.Wait For Exists    10000    className=android.widget.ImageButton    instance=1
+    NewOne.Click On    className=android.widget.ImageButton    instance=1
+    NewOne.Wait For Exists    10000    text=確定
+    NewOne.Click On    text=確定
+    NewOne.Wait For Exists    10000    text=名稱
+    NewOne.Click On    text=名稱
+    NewOne.type    G2
+    NewOne.Click On    text=電話    className=android.widget.EditText
+    NewOne.type    0963570376
+    NewOne.Click On    text=儲存
+    ${scroll_newone}    NewOne.Get Object    className=android.widget.ListView
+    NewOne.Wait For Exists    10000    className=android.widget.ListView
+    NewOne.Scroll To Vertically    ${scroll_newone}    text=G2
+    ${g2_exist_newone}    NewOne.Wait For Exists    10000    text=G2
+    Should Be True    ${g2_exist_newone}
+    NewOne.Press Home
+
+Add Contact at G2
+    G2.Wait For Exists    20000    text=電話簿
+    G2.Click On    text=電話簿
+    G2.Wait For Exists    20000    description=新增
+    G2.Click On    description=新增
+    ${phone_exist_g2}    G2.Wait For Exists    20000    text=手機
+    Run Keyword If    ${phone_exist_g2}    G2.Click On    text=手機
+    G2.Wait For Exists    20000    text=姓名
+    G2.Click On    text=姓名
+    G2.type    New One
+    G2.Click On    text=電話    className=android.widget.EditText
+    G2.type    0983465672
+    G2.Click On    text=完成
+    G2.Press Back
+    ${new_one_exist_g2}    G2.Wait For Exists    20000    text=New One
+    Should Be True    ${new_one_exist_g2}
+    G2.Press Home
+
+Login WhatsApp on NewOne
+    NewOne.Wait For Exists    180000    text=WhatsApp
+    NewOne.Click On    text=WhatsApp
+    NewOne.Wait For Exists    180000    text=同意並繼續
+    NewOne.Click On    text=同意並繼續
+    NewOne.Wait For Exists    180000    text=行動電話號碼    className=android.widget.EditText
+    NewOne.Click On    text=行動電話號碼    className=android.widget.EditText
+    NewOne.type    0983465672
+    NewOne.Wait For Exists    180000    text=OK
+    NewOne.Click On    text=OK
+    ${verify_exist_newone}    NewOne.Wait For Exists    180000    textContains=我們將驗證您的行動電話號碼
+    Run Keyword If    ${verify_exist_newone}    NewOne.Click On    text=OK
+    ${copy_exist_newone}    NewOne.Wait For Exists    20000    text=發現訊息備份！
+    Run Keyword If    ${copy_exist_newone}    Run Keywords    NewOne.Click On    text=不要還原    AND    NewOne.Wait For Exists
+    ...    180000    text=確認    AND    NewOne.Click On    text=不要恢復
+    ${personal_info_exist_newone}    NewOne.Wait For Exists    300000    text=個人資訊
+    Should Be True    ${personal_info_exist_newone}    NewOne簡訊驗證失敗
+    NewOne.Clear Text    className=android.widget.EditText
+    NewOne.Click On    className=android.widget.EditText
+    NewOne.type    NewOne
+    NewOne.Click On    text=下一步
+    NewOne.Wait For Exists    180000    text=繼續
+    NewOne.Click On    text=繼續
+    ${conversation_exist_newone}    NewOne.Wait For Exists    180000    text=對話
+    Should Be True    ${conversation_exist_newone}    WhatsApp開啟失敗
+    Clear Messages on NewOne
+
+Login WhatsApp on G2
+    G2.Wait For Exists    180000    text=WhatsApp
+    G2.Click On    text=WhatsApp
+    G2.Wait For Exists    180000    text=同意並繼續
+    G2.Click On    text=同意並繼續
+    G2.Wait For Exists    180000    text=行動電話號碼    className=android.widget.EditText
+    G2.Click On    text=行動電話號碼    className=android.widget.EditText
+    G2.type    0963570376
+    G2.Wait For Exists    180000    text=OK
+    G2.Click On    text=OK
+    ${verify_exist_g2}    G2.Wait For Exists    180000    textContains=我們將驗證您的行動電話號碼
+    Run Keyword If    ${verify_exist_g2}    G2.Click On    text=OK
+    ${copy_exist_g2}    G2.Wait For Exists    20000    textContains=發現訊息備份
+    Run Keyword If    ${copy_exist_g2}    Run Keywords    G2.Click On    text=不要還原    AND    G2.Wait For Exists
+    ...    180000    text=確認    AND    G2.Click On    text=不要恢復
+    ${personal_info_exist_g2}    G2.Wait For Exists    300000    text=個人資訊
+    Should Be True    ${personal_info_exist_g2}    G2簡訊驗證失敗
+    G2.Clear Text    className=android.widget.EditText
+    G2.Click On    className=android.widget.EditText
+    G2.type    G2
+    G2.Click On    text=下一步
+    G2.Wait For Exists    180000    text=繼續
+    G2.Click On    text=繼續
+    ${conversation_exist_g2}    G2.Wait For Exists    180000    text=對話
+    Should Be True    ${conversation_exist_g2}    WhatsApp開啟失敗
+    Clear Messages on G2
+
+G2 Send a Message to NewOne
+    [Arguments]    ${message}
+    G2.Click On    description=新增對話
+    G2.Wait For Exists    10000    text=選擇聯絡人
+    G2.Click On    text=New One
+    G2.Wait For Exists    10000    className=android.widget.EditText
+    G2.Click On    className=android.widget.EditText
+    G2.Type    ${message}
+    G2.Click On    className=android.widget.ImageButton    instance=1
+    G2.Press Back
+    G2.Press Back
+    ${conversation_exist}    G2.Wait For Exists    10000    text=對話
+    Should Be True    ${conversation_exist}
+
+Verify the Message on NewOne
+    [Arguments]    ${message}
+    NewOne.Wait For Exists    20000    text=G2
+    NewOne.Click On    text=G2
+    ${receive_message_exist}    NewOne.Wait For Exists    20000    textContains=${message}
+    Should Be True    ${receive_message_exist}    訊息傳送失敗
+    NewOne.Press Back
+    ${conversation_exist}    NewOne.Wait For Exists    10000    text=對話
+    Should Be True    ${conversation_exist}
+
+Clear Messages on NewOne
+    NewOne.Press Menu
+    NewOne.Wait For Exists    10000    text=設定
+    NewOne.Click On    text=設定
+    NewOne.Wait For Exists    10000    text=對話設定
+    NewOne.Click On    text=對話設定
+    NewOne.Wait For Exists    10000    text=刪除所有對話
+    NewOne.Click On    text=刪除所有對話
+    NewOne.Wait For Exists    10000    text=您確定要移除所有對話並刪除其對話內容?
+    NewOne.Click On    text=OK
+    NewOne.Wait For Exists    10000    text=對話設定
+    NewOne.Press Back
+    NewOne.Press Back
+    ${conversation_exist_newone}    NewOne.Wait For Exists    10000    text=對話
+    Should Be True    ${conversation_exist_newone}    WhatsApp刪除訊息失敗
+
+Clear Messages on G2
+    G2.Press Menu
+    G2.Wait For Exists    10000    text=設定
+    G2.Click On    text=設定
+    G2.Wait For Exists    10000    text=對話設定
+    G2.Click On    text=對話設定
+    G2.Wait For Exists    10000    text=刪除所有對話
+    G2.Click On    text=刪除所有對話
+    G2.Wait For Exists    10000    text=您確定要移除所有對話並刪除其對話內容?
+    G2.Click On    text=OK
+    G2.Wait For Exists    10000    text=對話設定
+    G2.Press Back
+    G2.Press Back
+    ${conversation_exist_g2}    G2.Wait For Exists    10000    text=對話
+    Should Be True    ${conversation_exist_g2}    WhatsApp刪除訊息失敗
+
+Delete Contact at NewOne
+    NewOne.Press Home
+    NewOne.Wait For Exists    10000    text=聯絡人
+    NewOne.Click On    text=聯絡人
+    ${confirm_exist_newone}    NewOne.Wait For Exists    5000    text=確定
+    Run Keyword If    ${confirm_exist_newone}    NewOne.Click On    text=確定
+    ${scroll_newone}    NewOne.Get Object    className=android.widget.ListView
+    NewOne.Wait For Exists    10000    className=android.widget.ListView
+    NewOne.Scroll To Vertically    ${scroll_newone}    text=G2
+    ${g2_exist_newone}    NewOne.Wait For Exists    10000    text=G2
+    Run Keyword Unless    ${g2_exist_newone}    NewOne.Press Back
+    Return From Keyword If    '${g2_exist_newone}' == '${false}'
+    NewOne.Click On    text=G2
+    NewOne.Wait For Exists    10000    text=詳細資料
+    NewOne.Press Menu
+    NewOne.Wait For Exists    10000    text=刪除
+    NewOne.Click On    text=刪除
+    NewOne.Wait For Exists    10000    text=您確定要刪除這個聯絡人嗎？
+    NewOne.Click On    text=確定
+    NewOne.Wait For Exists    10000    text=聯絡人
+    NewOne.Press Back
+    NewOne.Press Home
+
+Delete Contact at G2
+    G2.Press Home
+    G2.Wait For Exists    20000    text=電話簿
+    G2.Click On    text=電話簿
+    G2.Wait For Exists    20000    description=新增
+    G2.Press Menu
+    G2.Wait For Exists    20000    text=刪除聯絡人
+    G2.Click On    text=刪除聯絡人
+    G2.Wait For Exists    20000    description=全選
+    G2.Click On    description=全選
+    G2.Click On    description=刪除聯絡人
+    ${delete_confirm}    G2.Wait For Exists    5000    text=確認要刪除已選定聯絡人嗎？
+    Run Keyword Unless    ${delete_confirm}    Run Keywords    G2.Press Back    G2.Press Home
+    Return From Keyword If    '${delete_confirm}' == '${false}'
+    G2.Click On    text=確定
+    G2.Wait For Exists    20000    description=新增
+    G2.Press Back
+    G2.Press Home
+
+Uninstall WhatsApp on NewOne
+    NewOne.Press Home
+    NewOne.Wait For Exists    10000    text=設定
+    NewOne.Click On    text=設定
+    ${scroll_newone}    NewOne.Get Object    className=android.widget.ListView
+    NewOne.Wait For Exists    10000    className=android.widget.ListView
+    NewOne.Scroll To Vertically    ${scroll_newone}    text=應用程式
+    ${scroll_newone}    Set Variable    ${None}
+    NewOne.Click On    text=應用程式
+    NewOne.Wait For Exists    10000    className=android.widget.ListView
+    ${scroll_newone}    NewOne.Get Object    className=android.widget.ListView
+    NewOne.Scroll To Vertically    ${scroll_newone}    text=WhatsApp
+    ${scroll_newone}    Set Variable    ${None}
+    ${app_exist_newone}    NewOne.Wait For Exists    2000    text=WhatsApp
+    Run Keyword Unless    ${app_exist_newone}    NewOne.Press Home
+    Return From Keyword If    '${app_exist_newone}' == '${false}'
+    NewOne.Click On    text=WhatsApp
+    NewOne.Wait For Exists    10000    text=解除安裝
+    NewOne.Click On    text=解除安裝
+    NewOne.Wait For Exists    10000    text=是否要解除安裝此應用程式？
+    NewOne.Click On    text=確定
+    NewOne.Wait For Exists    20000    text=應用程式
+    NewOne.Press Home
+
+Uninstall WhatsApp on G2
+    G2.Press Home
+    G2.Wait For Exists    10000    text=設定
+    G2.Click On    text=設定
+    ${scroll_g2}    G2.Get Object    className=android.widget.ListView
+    G2.Wait For Exists    10000    className=android.widget.ListView
+    G2.Scroll To Beginning Vertically    ${scroll_g2}
+    G2.Scroll To Vertically    ${scroll_g2}    text=應用程式
+    ${scroll_g2}    Set Variable    ${None}
+    G2.Click On    text=應用程式
+    G2.Wait For Exists    10000    text=管理應用程式
+    G2.Click On    text=管理應用程式
+    G2.Wait For Exists    10000    className=android.widget.ListView
+    ${scroll_g2}    G2.Get Object    className=android.widget.ListView
+    G2.Scroll To Vertically    ${scroll_g2}    text=WhatsApp
+    ${scroll_g2}    Set Variable    ${None}
+    ${app_exist_g2}    G2.Wait For Exists    2000    text=WhatsApp
+    Run Keyword Unless    ${app_exist_g2}    G2.Press Home
+    Return From Keyword If    '${app_exist_g2}' == '${false}'
+    G2.Click On    text=WhatsApp
+    G2.Wait For Exists    10000    text=解除安裝
+    G2.Click On    text=解除安裝
+    G2.Wait For Exists    10000    text=您要解除安裝這個應用程式嗎？
+    G2.Click On    text=確定
+    G2.Wait For Exists    20000    text=解除安裝完成。
+    G2.Click On    text=確定
+    G2.Press Home
+
+Setup WhatsApp on NewOne
+    Comment    Clear Connected Wifi on NewOne
+    Comment    Open NewOne's Wi-Fi
+    Clear Google Account on NewOne
+    Login Google Play on NewOne
+    Uninstall WhatsApp on NewOne
+    Install WhatsApp on NewOne
+    Delete Contact at NewOne
+    Add Contact at NewOne
+    Login WhatsApp on NewOne
+
+Setup WhatsApp on G2
+    Comment    Clear Connected Wifi on G2
+    Comment    Open G2's Wi-Fi
+    Clear Google Account on G2
+    Login Google Play on G2
+    Uninstall WhatsApp on G2
+    Install WhatsApp on G2
+    Delete Contact at G2
+    Add Contact at G2
+    Login WhatsApp on G2

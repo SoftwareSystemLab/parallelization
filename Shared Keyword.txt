@@ -1,0 +1,219 @@
+*** Settings ***
+Library           Parallelization.py
+Library           Mobile.py    HT37TW9A0401    WITH NAME    NewOne
+Library           Mobile.py    MSM8225QSKUD    WITH NAME    G2
+
+*** Variables ***
+${infinite}       1000000
+
+*** Keywords ***
+Open NewOne's Wi-Fi
+    Clear Connected Wifi on NewOne
+    NewOne.Wait For Exists    10000    text=設定
+    NewOne.Click On    text=設定
+    NewOne.Sleep    5000
+    NewOne.Wait For Exists    10000    textContains=Wi
+    NewOne.Click On    textContains=Wi
+    ${off_newone}    NewOne.Wait For Exists    5000    className=android.widget.Switch    checked=false
+    Run Keyword If    ${off_newone}    NewOne.Click On    className=android.widget.Switch    checked=false
+    ${off_newone}    Set Variable    ${None}
+    NewOne.Sleep    10000
+    : FOR    ${i}    IN RANGE    ${infinite}
+    \    ${wifi_newone}    NewOne.Get Object    className=android.widget.ListView
+    \    NewOne.Scroll To Vertically    ${wifi_newone}    text=WEP
+    \    ${wifi_newone}    Set Variable    ${None}
+    \    NewOne.Click On    text=WEP
+    \    ${is_open_exist_newone}    NewOne.Wait For Exists    10000    className=android.widget.Switch
+    \    ${is_correct_name_newone}    NewOne.Wait For Exists    10000    text=WEP
+    \    Run Keyword If    ${is_open_exist_newone}    Run Keywords    NewOne.Click On    text=已連線    AND
+    \    ...    NewOne.Wait For Exists    10000    text=中斷連線    AND    NewOne.Click On
+    \    ...    text=中斷連線    ELSE    Run Keyword If    ${is_correct_name_newone}    Run Keywords
+    \    ...    NewOne.Type    12345    AND    NewOne.Click On    text=連線
+    \    ...    ELSE    NewOne.Click On    text=取消
+    \    ${wifi_newone}    NewOne.Get Object    className=android.widget.ListView
+    \    NewOne.Scroll To Beginning Vertically    ${wifi_newone}
+    \    ${wifi_newone}    Set Variable    ${None}
+    \    ${is_connected_newone}    NewOne.Wait For Exists    10000    text=已連線
+    \    Exit For Loop If    ${is_connected_newone}
+    ${connected_exist_newone}    NewOne.Wait For Exists    30000    text=已連線
+    Should Be True    ${connected_exist_newone}
+    NewOne.Press Home
+
+Open G2's Wi-Fi
+    Clear Connected Wifi on G2
+    G2.Wait For Exists    10000    text=設定
+    G2.Click On    text=設定
+    G2.Sleep    5000
+    ${scroll_g2}    G2.Get Object    className=android.widget.ListView
+    G2.Wait For Exists    10000    className=android.widget.ListView
+    G2.Scroll To Beginning Vertically    ${scroll_g2}
+    ${scroll_g2}    Set Variable    ${None}
+    G2.Wait For Exists    10000    textContains=Wi
+    G2.Click On    textContains=Wi
+    ${off_g2}    G2.Wait For Exists    5000    className=android.widget.Switch    text=關閉
+    Run Keyword If    ${off_g2}    G2.Click On    className=android.widget.Switch    text=關閉
+    G2.Sleep    10000
+    : FOR    ${i}    IN RANGE    ${infinite}
+    \    ${wifi_g2}    G2.Get Object    className=android.widget.ListView
+    \    G2.Scroll To Vertically    ${wifi_g2}    text=WEP
+    \    ${wifi_g2}    Set Variable    ${None}
+    \    G2.Click On    text=WEP
+    \    ${is_open_exist_g2}    G2.Wait For Exists    10000    className=android.widget.Switch
+    \    ${is_correct_name_g2}    G2.Wait For Exists    10000    text=WEP
+    \    Run Keyword If    ${is_open_exist_g2}    Run Keywords    G2.Long Click On    text=已連線    AND
+    \    ...    G2.Wait For Exists    10000    text=清除網路    AND    G2.Click On
+    \    ...    text=清除網路    ELSE    Run Keyword If    ${is_correct_name_g2}    Run Keywords
+    \    ...    G2.Type    12345    AND    G2.Click On    text=連線
+    \    ...    ELSE    G2.Click On    text=取消
+    \    ${wifi_g2}    G2.Get Object    className=android.widget.ListView
+    \    G2.Scroll To Beginning Vertically    ${wifi_g2}
+    \    ${wifi_g2}    Set Variable    ${None}
+    \    ${is_connected_g2}    G2.Wait For Exists    10000    text=已連線
+    \    Exit For Loop If    ${is_connected_g2}
+    ${connected_exist_g2}    G2.Wait For Exists    30000    text=已連線
+    Should Be True    ${connected_exist_g2}
+    G2.Press Home
+
+Login Google Play on NewOne
+    NewOne.Wait For Exists    10000    text=Play 商店
+    NewOne.Click On    text=Play 商店
+    NewOne.Wait For Exists    300000    text=現有帳戶
+    NewOne.Click On    text=現有帳戶
+    NewOne.Wait For Exists    300000    text=電子郵件
+    NewOne.Click On    text=電子郵件
+    NewOne.type    hp15071hp@gmail.com
+    NewOne.Wait For Exists    300000    className=android.widget.EditText    index=1
+    NewOne.Click On    className=android.widget.EditText    index=1
+    NewOne.type    isharaliu1012
+    NewOne.Click On    description=繼續
+    NewOne.Wait For Exists    300000    text=確定
+    NewOne.Click On    text=確定
+    NewOne.Wait For Exists    300000    description=繼續
+    NewOne.Click On    description=繼續
+    NewOne.Wait For Exists    300000    text=略過
+    NewOne.Click On    text=略過
+    ${apps_exist_newone}    NewOne.Wait For Exists    300000    text=應用程式
+    Should Be True    ${apps_exist_newone}
+    NewOne.Press Home
+
+Login Google Play on G2
+    G2.Wait For Exists    10000    text=Play 商店
+    G2.Click On    text=Play 商店
+    G2.Wait For Exists    10000    text=現有帳戶
+    G2.Click On    text=現有帳戶
+    G2.Wait For Exists    10000    text=電子郵件
+    G2.Click On    text=電子郵件
+    G2.type    inhon.autotest.5@gmail.com
+    G2.Wait For Exists    10000    className=android.widget.EditText    index=1
+    G2.Click On    className=android.widget.EditText    index=1
+    G2.type    auto12345
+    G2.Click On    description=下一步
+    ${confirm_exist_g2}    G2.Wait For Exists    10000    text=確定
+    Run Keyword If    ${confirm_exist_g2}    G2.Click On    text=確定
+    G2.Wait For Exists    180000    text=暫時不要
+    G2.Click On    text=暫時不要
+    G2.Wait For Exists    180000    text=設定付款資訊
+    G2.Click On    text=略過
+    G2.Wait For Exists    180000    description=下一步
+    G2.Click On    description=下一步
+    ${apps_exist_g2}    G2.Wait For Exists    180000    text=應用程式
+    Should Be True    ${apps_exist_g2}
+    G2.Press Home
+
+Clear Connected Wifi on NewOne
+    NewOne.Press Home
+    NewOne.Click On    text=設定
+    NewOne.Sleep    2000
+    NewOne.Wait For Exists    10000    textContains=Wi
+    NewOne.Click On    textContains=Wi
+    ${off_newone}    NewOne.Wait For Exists    5000    className=android.widget.Switch    checked=false
+    Run Keyword If    ${off_newone}    NewOne.Click On    className=android.widget.Switch    checked=false
+    NewOne.Sleep    5000
+    : FOR    ${i}    IN RANGE    ${infinite}
+    \    ${connected_exist_newone}    NewOne.Wait For Exists    30000    text=已連線
+    \    Exit For Loop If    '${connected_exist_newone}' == '${false}'
+    \    NewOne.Click On    text=已連線
+    \    NewOne.Wait For Exists    10000    text=中斷連線
+    \    NewOne.Click On    text=中斷連線
+    \    NewOne.Sleep    2000
+    NewOne.Click On    className=android.widget.Switch    checked=true
+    NewOne.Sleep    2000
+    NewOne.Press Home
+
+Clear Connected Wifi on G2
+    G2.Press Home
+    G2.Click On    text=設定
+    G2.Sleep    2000
+    ${scroll_g2}    G2.Get Object    className=android.widget.ListView
+    G2.Wait For Exists    10000    className=android.widget.ListView
+    G2.Scroll To Beginning Vertically    ${scroll_g2}
+    ${scroll_g2}    Set Variable    ${None}
+    G2.Wait For Exists    10000    textContains=Wi
+    G2.Click On    textContains=Wi
+    ${off_g2}    G2.Wait For Exists    5000    className=android.widget.Switch    text=關閉
+    Run Keyword If    ${off_g2}    G2.Click On    className=android.widget.Switch    text=關閉
+    G2.Sleep    5000
+    : FOR    ${i}    IN RANGE    ${infinite}
+    \    ${connected_exist_g2}    G2.Wait For Exists    30000    text=已連線
+    \    Exit For Loop If    '${connected_exist_g2}' == '${false}'
+    \    G2.Long Click On    text=已連線
+    \    G2.Wait For Exists    10000    text=清除網路
+    \    G2.Click On    text=清除網路
+    \    G2.Sleep    2000
+    G2.Click On    className=android.widget.Switch    text=開啟
+    G2.Sleep    2000
+    G2.Press Home
+
+Clear Google Account on NewOne
+    NewOne.Press Home
+    NewOne.Wait For Exists    10000    text=設定
+    NewOne.Click On    text=設定
+    ${scroll_newone}    NewOne.Get Object    className=android.widget.ListView
+    NewOne.Wait For Exists    10000    className=android.widget.ListView
+    NewOne.Scroll To Vertically    ${scroll_newone}    text=帳號與同步處理
+    ${scroll_newone}    Set Variable    ${None}
+    NewOne.Click On    text=帳號與同步處理
+    NewOne.Wait For Exists    10000    className=android.widget.ListView
+    ${scroll_newone}    NewOne.Get Object    className=android.widget.ListView
+    NewOne.Scroll To Vertically    ${scroll_newone}    text=Google
+    ${scroll_newone}    Set Variable    ${None}
+    ${Google_exist_newone}    NewOne.Wait For Exists    2000    text=Google
+    Run Keyword Unless    ${Google_exist_newone}    Run Keywords    NewOne.Press Home    AND    Return From Keyword
+    NewOne.Click On    text=Google
+    NewOne.Wait For Exists    10000    textContains=@gmail.com
+    NewOne.Click On    textContains=@gmail.com
+    NewOne.Wait For Exists    10000    text=帳戶設定
+    NewOne.Press Menu
+    NewOne.Wait For Exists    10000    text=移除
+    NewOne.Click On    text=移除
+    NewOne.Wait For Exists    10000    text=移除帳戶
+    NewOne.Click On    text=移除帳戶    className=android.widget.Button
+    ${auto_sync_newone}    NewOne.Wait For Exists    10000    text=自動同步
+    Should Be True    ${auto_sync_newone}    移除帳戶失敗
+    NewOne.Press Home
+
+Clear Google Account on G2
+    G2.Press Home
+    G2.Wait For Exists    10000    text=設定
+    G2.Click On    text=設定
+    ${scroll_g2}    G2.Get Object    className=android.widget.ListView
+    G2.Wait For Exists    10000    className=android.widget.ListView
+    G2.Scroll To Beginning Vertically    ${scroll_g2}
+    G2.Scroll To Vertically    ${scroll_g2}    text=Google
+    ${scroll_g2}    Set Variable    ${None}
+    ${Google_exist_g2}    G2.Wait For Exists    2000    text=Google
+    ${scroll_g2}    G2.Get Object    className=android.widget.ListView
+    Run Keyword Unless    ${Google_exist_g2}    Run Keywords    G2.Scroll To Beginning Vertically    ${scroll_g2}    AND    G2.Press Home
+    ${scroll_g2}    Set Variable    ${None}
+    Return From Keyword If    '${Google_exist_g2}' == '${false}'
+    G2.Click On    text=Google
+    G2.Wait For Exists    10000    textContains=@gmail.com
+    G2.Click On    textContains=@gmail.com
+    G2.Wait For Exists    10000    text=同步處理
+    G2.Press Menu
+    G2.Wait For Exists    10000    text=移除帳戶
+    G2.Click On    text=移除帳戶
+    G2.Wait For Exists    10000    text=您要移除帳戶嗎？
+    G2.Click On    text=移除帳戶
+    G2.Wait For Exists    10000    text=設定
+    G2.Press Home

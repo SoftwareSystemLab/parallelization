@@ -1,0 +1,504 @@
+*** Settings ***
+Library           Parallelization.py
+Library           Mobile.py    4d00af1dd460408d    WITH NAME    S4
+Library           Mobile.py    FA357PN01129    WITH NAME    Butterfly
+Library           Mobile.py    HT37TW9A0401    WITH NAME    NewOne
+Library           Mobile.py    MSM8225QSKUD    WITH NAME    G2
+
+*** Variables ***
+${infinite}       1000000
+
+*** Test Cases ***
+BluetoothPairedTest
+    [Documentation]    藍芽配對功能測試
+    ${set_up_phone_A}    Run Async    Set the phoneA's Bluetooth
+    ${set_up_phone_B}    Run Async    Set the phoneB's Bluetooth
+    Wait Until    ${set_up_phone_A}    ${set_up_phone_B}
+    Send a Bluetooth Pairing Request to PhoneB
+    Confirm the Pairing Request from A
+    [Teardown]    Stop All Async Tasks
+
+GoogleDocSyncTest
+    Comment    ${s4_email}    Set Variable    pseudohardware@gmail.com
+    Comment    ${s4_password}    Set Variable    NTUTSOFTSYSLabPS4Mobile
+    Comment    ${newone_email}    Set Variable    hp15071hp@gmail.com
+    Comment    ${newone_password}    Set Variable    isharaliu1012
+    Comment    ${butterfly_email}    Set Variable    pseudosoftware@gmail.com
+    Comment    ${butterfly_password}    Set Variable    NTUTSoftSysLabPS4Mobile
+    ${s4}    Run Async    Open document from Google Drive with S4
+    Comment    ${butterfly}    Run Async    Open document from Google Drive with Butterfly
+    ${new_one}    Run Async    Open document from Google Drive with NewOne
+    Wait Until    ${new_one}    ${s4}
+    NewOne.Press Enter
+    Comment    Butterfly.Press Enter
+    ${s4}    Run Async    Edit document with S4
+    ${new_one}    Run Async    Edit document with NewOne
+    Comment    ${butterfly}    Run Async    Edit document with Butterfly
+    is_alive
+    stop_all_async_tasks
+    is_alive
+    BuiltIn.sleep    5s
+    log    -----------------------------------
+    is_alive
+    BuiltIn.sleep    5s
+    log    -----------------------------------
+    is_alive
+    BuiltIn.sleep    5s
+    log    -----------------------------------
+    is_alive
+    Wait Until    ${new_one}    ${s4}
+
+WhatsAppTest
+    ${message}    Set Variable    WhatsApp傳送訊息
+    ${new_one}    Run Async    Install and Setup WhatsApp on NewOne
+    ${g2}    Run Async    Install and Setup WhatsApp on G2
+    Wait Until    ${new_one}    ${g2}
+    G2 Send a Message to NewOne    ${message}
+    Verify the Message on NewOne    ${message}
+    Clear Messages on NewOne
+    Clear Messages on G2
+    [Teardown]    Stop All Async Tasks
+
+*** Keywords ***
+Set the phoneA's Bluetooth
+
+Set the phoneB's Bluetooth
+
+Send a Bluetooth Pairing Request to PhoneB
+
+Confirm the Pairing Request from A
+
+Open document from Google Drive with S4
+    S4.Press Home
+    S4.Click On    description=雲端硬碟
+    S4.Wait For Exists    10000    description=測試共用文件 Google 文件
+    S4.Click On    description=測試共用文件 Google 文件
+    ${open_success}    S4.Wait For Exists    10000    description=詳細資訊
+    Should Be True    ${open_success}    S4開啟文件失敗
+    S4.Click On    className=android.widget.EditText
+
+Open document from Google Drive with Butterfly
+    Butterfly.Press Home
+    Butterfly.Click On    text=雲端硬碟
+    Butterfly.Wait For Exists    10000    description=我的雲端硬碟：開啟導覽匣
+    Butterfly.Click On    description=我的雲端硬碟：開啟導覽匣
+    Butterfly.Wait For Exists    10000    text=與我共用的文件
+    Butterfly.Click On    text=與我共用的文件
+    Butterfly.Wait For Exists    10000    description=測試共用文件 Google 文件
+    Butterfly.Click On    description=測試共用文件 Google 文件
+    ${open_success}    Butterfly.Wait For Exists    10000    description=詳細資訊
+    Should Be True    ${open_success}    Butterfly開啟文件失敗
+    Butterfly.Click On    className=android.widget.EditText
+
+Open document from Google Drive with NewOne
+    NewOne.Press Home
+    NewOne.Click On    text=雲端硬碟
+    NewOne.Wait For Exists    10000    description=我的雲端硬碟：開啟導覽匣
+    NewOne.Click On    description=我的雲端硬碟：開啟導覽匣
+    NewOne.Wait For Exists    10000    text=與我共用的文件
+    NewOne.Click On    text=與我共用的文件
+    NewOne.Wait For Exists    10000    description=測試共用文件 Google 文件
+    NewOne.Click On    description=測試共用文件 Google 文件
+    ${open_success}    NewOne.Wait For Exists    10000    description=詳細資訊
+    Should Be True    ${open_success}    NewOne開啟文件失敗
+    NewOne.Click On    className=android.widget.EditText
+
+Edit document with S4
+    S4.type    This is the S4 in writing
+    S4.type    This is the S4 in writing
+    S4.type    This is the S4 in writing
+    S4.type    This is the S4 in writing
+    S4.type    This is the S4 in writing
+    S4.type    This is the S4 in writing
+    S4.type    This is the S4 in writing
+    S4.type    This is the S4 in writing
+    S4.type    This is the S4 in writing
+    S4.type    This is the S4 in writing
+    S4.type    This is the S4 in writing
+    S4.type    This is the S4 in writing
+
+Edit document with NewOne
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+    NewOne.type    This is the NewOne in writing
+
+Edit document with Butterfly
+    Butterfly.type    This is the Butterfly in writing
+    Butterfly.type    This is the Butterfly in writing
+    Butterfly.type    This is the Butterfly in writing
+    Butterfly.type    This is the Butterfly in writing
+    Butterfly.type    This is the Butterfly in writing
+    Butterfly.type    This is the Butterfly in writing
+    Butterfly.type    This is the Butterfly in writing
+    Butterfly.type    This is the Butterfly in writing
+    Butterfly.type    This is the Butterfly in writing
+    Butterfly.type    This is the Butterfly in writing
+    Butterfly.type    This is the Butterfly in writing
+    Butterfly.type    This is the Butterfly in writing
+
+Open NewOne's Wi-Fi
+    Clear Connected Wifi on NewOne
+    ${ssid}    Set Variable    WEP
+    ${ssid_password}    Set Variable    12345
+    NewOne.Wait For Exists    10000    text=設定
+    NewOne.Click On    text=設定
+    NewOne.Wait For Exists    10000    textContains=Wi
+    NewOne.Click On    textContains=Wi
+    ${off}    NewOne.Wait For Exists    5000    className=android.widget.Switch    checked=false
+    Run Keyword If    ${off}    NewOne.Click On    className=android.widget.Switch    checked=false
+    NewOne.Sleep    10000
+    : FOR    ${i}    IN RANGE    ${infinite}
+    \    ${wifi}    NewOne.Get Object    className=android.widget.ListView
+    \    NewOne.Scroll To Vertically    ${wifi}    text=${ssid}
+    \    NewOne.Click On    text=${ssid}
+    \    ${is_open_exist}    NewOne.Wait For Exists    10000    className=android.widget.Switch
+    \    ${is_correct_name}    NewOne.Wait For Exists    10000    text=${ssid}
+    \    Run Keyword If    ${is_open_exist}    Run Keywords    NewOne.Click On    text=已連線    AND
+    \    ...    NewOne.Wait For Exists    10000    text=中斷連線    AND    NewOne.Click On
+    \    ...    text=中斷連線    ELSE    Run Keyword If    ${is_correct_name}    Run Keywords
+    \    ...    NewOne.Type    ${ssid_password}    AND    NewOne.Click On    text=連線
+    \    ...    ELSE    NewOne.Click On    text=取消
+    \    ${is_connected}    NewOne.Wait For Exists    10000    text=已連線
+    \    NewOne.Scroll To Beginning Vertically    ${wifi}
+    \    Run Keyword If    ${is_connected}    Exit For Loop
+    ${connected_exist}    NewOne.Wait For Exists    30000    text=已連線
+    Should Be True    ${connected_exist}
+    NewOne.Press Home
+
+Open G2's Wi-Fi
+    Clear Connected Wifi on G2
+    ${ssid}    Set Variable    WEP
+    ${ssid_password}    Set Variable    12345
+    G2.Wait For Exists    10000    text=設定
+    G2.Click On    text=設定
+    G2.Wait For Exists    10000    textContains=Wi
+    G2.Click On    textContains=Wi
+    ${off}    G2.Wait For Exists    5000    className=android.widget.Switch    text=關閉
+    Run Keyword If    ${off}    G2.Click On    className=android.widget.Switch    text=關閉
+    G2.Sleep    10000
+    : FOR    ${i}    IN RANGE    ${infinite}
+    \    ${wifi}    G2.Get Object    className=android.widget.ListView
+    \    G2.Scroll To Vertically    ${wifi}    text=${ssid}
+    \    G2.Click On    text=${ssid}
+    \    ${is_open_exist}    G2.Wait For Exists    10000    className=android.widget.Switch
+    \    ${is_correct_name}    G2.Wait For Exists    10000    text=${ssid}
+    \    Run Keyword If    ${is_open_exist}    Run Keywords    G2.Long Click On    text=已連線    AND
+    \    ...    G2.Wait For Exists    10000    text=清除網路    AND    G2.Click On
+    \    ...    text=清除網路    ELSE    Run Keyword If    ${is_correct_name}    Run Keywords
+    \    ...    G2.Type    ${ssid_password}    AND    G2.Click On    text=連線
+    \    ...    ELSE    G2.Click On    text=取消
+    \    ${is_connected}    G2.Wait For Exists    10000    text=已連線
+    \    G2.Scroll To Beginning Vertically    ${wifi}
+    \    Run Keyword If    ${is_connected}    Exit For Loop
+    ${connected_exist}    G2.Wait For Exists    30000    text=已連線
+    Should Be True    ${connected_exist}
+    G2.Press Home
+
+Login Google Play on NewOne
+    NewOne.Click On    text=Play 商店
+    NewOne.Wait For Exists    10000    text=現有帳戶
+    NewOne.Click On    text=現有帳戶
+    NewOne.Wait For Exists    10000    text=電子郵件
+    NewOne.Click On    text=電子郵件
+    NewOne.type    hp15071hp@gmail.com
+    NewOne.Wait For Exists    10000    className=android.widget.EditText    index=1
+    NewOne.Click On    className=android.widget.EditText    index=1
+    NewOne.type    isharaliu1012
+    NewOne.Click On    description=繼續
+    NewOne.Wait For Exists    10000    text=確定
+    NewOne.Click On    text=確定
+    NewOne.Wait For Exists    10000    description=繼續
+    NewOne.Click On    description=繼續
+    NewOne.Wait For Exists    10000    text=暫時不要
+    NewOne.Click On    text=暫時不要
+    ${apps_exist}    NewOne.Wait For Exists    60000    text=應用程式
+    Should Be True    ${apps_exist}
+
+Login Google Play on G2
+    G2.Click On    text=Play 商店
+    G2.Wait For Exists    10000    text=現有帳戶
+    G2.Click On    text=現有帳戶
+    G2.Wait For Exists    10000    text=電子郵件
+    G2.Click On    text=電子郵件
+    G2.type    inhon.autotest.5@gmail.com
+    G2.Wait For Exists    10000    className=android.widget.EditText    index=1
+    G2.Click On    className=android.widget.EditText    index=1
+    G2.type    auto12345
+    G2.Click On    description=下一步
+    ${confirm_exist}    G2.Wait For Exists    10000    text=確定
+    Run Keyword If    ${confirm_exist}    G2.Click On    text=確定
+    G2.Wait For Exists    20000    text=暫時不要
+    G2.Click On    text=暫時不要
+    G2.Wait For Exists    20000    text=設定付款資訊
+    G2.Click On    text=暫時不要
+    G2.Wait For Exists    10000    description=下一步
+    G2.Click On    description=下一步
+    ${apps_exist}    G2.Wait For Exists    60000    text=應用程式
+    Should Be True    ${apps_exist}
+
+Install WhatsApp on NewOne
+    NewOne.Click On    description=搜尋 Google Play
+    NewOne.type    WhatsApp
+    NewOne.Press Enter
+    NewOne.Wait For Exists    20000    text=WhatsApp Messenger
+    NewOne.Click On    text=WhatsApp Messenger
+    NewOne.Wait For Exists    10000    text=安裝
+    NewOne.Click On    text=安裝
+    NewOne.Wait For Exists    10000    text=接受
+    NewOne.Click On    text=接受
+    ${uninstall_exist}    NewOne.Wait For Exists    120000    text=解除安裝
+    Should Be True    ${uninstall_exist}
+    NewOne.Press Home
+
+Install WhatsApp on G2
+    G2.Click On    description=搜尋 Google Play
+    G2.type    WhatsApp
+    G2.Press Enter
+    G2.Wait For Exists    20000    text=WhatsApp Messenger
+    G2.Click On    text=WhatsApp Messenger
+    G2.Wait For Exists    10000    text=安裝
+    G2.Click On    text=安裝
+    G2.Wait For Exists    10000    text=接受
+    G2.Click On    text=接受
+    ${uninstall_exist}    G2.Wait For Exists    120000    text=解除安裝
+    Should Be True    ${uninstall_exist}
+    G2.Press Home
+
+Add Contact at NewOne
+    NewOne.Wait For Exists    10000    text=聯絡人
+    NewOne.Click On    text=聯絡人
+    ${confirm_exist}    NewOne.Wait For Exists    5000    text=確定
+    Run Keyword If    ${confirm_exist}    NewOne.Click On    text=確定
+    NewOne.Wait For Exists    10000    className=android.widget.ImageButton    instance=1
+    NewOne.Click On    className=android.widget.ImageButton    instance=1
+    NewOne.Wait For Exists    10000    text=確定
+    NewOne.Click On    text=確定
+    NewOne.Wait For Exists    10000    text=名稱
+    NewOne.Click On    text=名稱
+    NewOne.type    G2
+    NewOne.Click On    text=電話    className=android.widget.EditText
+    NewOne.type    0963570376
+    NewOne.Click On    text=儲存
+    ${scroll}    NewOne.Get Object    className=android.widget.ListView
+    NewOne.Wait For Exists    10000    className=android.widget.ListView
+    NewOne.Scroll To Vertically    ${scroll}    text=G2
+    ${g2_exist}    NewOne.Wait For Exists    10000    text=G2
+    Should Be True    ${g2_exist}
+    NewOne.Press Home
+
+Add Contact at G2
+    G2.Wait For Exists    20000    text=電話簿
+    G2.Click On    text=電話簿
+    G2.Wait For Exists    20000    description=新增
+    G2.Click On    description=新增
+    ${phone_exist}    G2.Wait For Exists    20000    text=手機
+    Run Keyword If    ${phone_exist}    G2.Click On    text=手機
+    G2.Wait For Exists    20000    text=姓名
+    G2.Click On    text=姓名
+    G2.type    New One
+    G2.Click On    text=電話    className=android.widget.EditText
+    G2.type    0922772202
+    G2.Click On    text=完成
+    G2.Press Back
+    ${new_one_exist}    G2.Wait For Exists    20000    text=New One
+    Should Be True    ${new_one_exist}
+    G2.Press Home
+
+Login WhatsApp on NewOne
+    NewOne.Wait For Exists    10000    text=WhatsApp
+    NewOne.Click On    text=WhatsApp
+    NewOne.Wait For Exists    10000    text=同意並繼續
+    NewOne.Click On    text=同意並繼續
+    NewOne.Wait For Exists    10000    text=行動電話號碼    className=android.widget.EditText
+    NewOne.Click On    text=行動電話號碼    className=android.widget.EditText
+    NewOne.type    0922772202
+    NewOne.Wait For Exists    10000    text=OK
+    NewOne.Click On    text=OK
+    ${verify_exist}    NewOne.Wait For Exists    10000    textContains=我們將驗證您的行動電話號碼
+    Run Keyword If    ${verify_exist}    NewOne.Click On    text=OK
+    ${copy_exist}    NewOne.Wait For Exists    10000    text=發現訊息備份！
+    Run Keyword If    ${copy_exist}    Run Keywords    NewOne.Click On    text=不要還原    AND    NewOne.Wait For Exists
+    ...    10000    text=確認    AND    NewOne.Click On    text=不要恢復
+    ${personal_info_exist}    NewOne.Wait For Exists    60000    text=個人資訊
+    Should Be True    ${personal_info_exist}    NewOne簡訊驗證失敗
+    NewOne.Clear Text    className=android.widget.EditText
+    NewOne.Click On    className=android.widget.EditText
+    NewOne.type    NewOne
+    NewOne.Click On    text=下一步
+    NewOne.Wait For Exists    10000    text=繼續
+    NewOne.Click On    text=繼續
+    ${conversation_exist}    NewOne.Wait For Exists    10000    text=對話
+    Should Be True    ${conversation_exist}    WhatsApp開啟失敗
+    Clear Messages on NewOne
+
+Login WhatsApp on G2
+    G2.Wait For Exists    10000    text=WhatsApp
+    G2.Click On    text=WhatsApp
+    G2.Wait For Exists    10000    text=同意並繼續
+    G2.Click On    text=同意並繼續
+    G2.Wait For Exists    10000    text=行動電話號碼    className=android.widget.EditText
+    G2.Click On    text=行動電話號碼    className=android.widget.EditText
+    G2.type    0963570376
+    G2.Wait For Exists    10000    text=OK
+    G2.Click On    text=OK
+    ${verify_exist}    G2.Wait For Exists    10000    textContains=我們將驗證您的行動電話號碼
+    Run Keyword If    ${verify_exist}    G2.Click On    text=OK
+    ${personal_info_exist}    G2.Wait For Exists    60000    text=個人資訊
+    Should Be True    ${personal_info_exist}    G2簡訊驗證失敗
+    G2.Clear Text    className=android.widget.EditText
+    G2.Click On    className=android.widget.EditText
+    G2.type    G2
+    G2.Click On    text=下一步
+    G2.Wait For Exists    10000    text=繼續
+    G2.Click On    text=繼續
+    ${conversation_exist}    G2.Wait For Exists    10000    text=對話
+    Should Be True    ${conversation_exist}    WhatsApp開啟失敗
+    Clear Messages on G2
+
+G2 Send a Message to NewOne
+    [Arguments]    ${message}
+    G2.Click On    description=新增對話
+    G2.Wait For Exists    10000    text=選擇聯絡人
+    G2.Click On    text=New One
+    G2.Wait For Exists    10000    className=android.widget.EditText
+    G2.Click On    className=android.widget.EditText
+    G2.Type    ${message}
+    G2.Click On    className=android.widget.ImageButton    instance=1
+    G2.Press Back
+    G2.Press Back
+    ${conversation_exist}    G2.Wait For Exists    10000    text=對話
+    Should Be True    ${conversation_exist}
+
+Verify the Message on NewOne
+    [Arguments]    ${message}
+    NewOne.Wait For Exists    20000    text=G2
+    NewOne.Click On    text=G2
+    ${receive_message_exist}    NewOne.Wait For Exists    20000    textContains=${message}
+    Should Be True    ${receive_message_exist}    訊息傳送失敗
+    NewOne.Press Back
+    ${conversation_exist}    NewOne.Wait For Exists    10000    text=對話
+    Should Be True    ${conversation_exist}
+
+Install and Setup WhatsApp on NewOne
+    Open NewOne's Wi-Fi
+    Login Google Play on NewOne
+    Install WhatsApp on NewOne
+    Add Contact at NewOne
+    Login WhatsApp on NewOne
+
+Install and Setup WhatsApp on G2
+    Open G2's Wi-Fi
+    Login Google Play on G2
+    Install WhatsApp on G2
+    Add Contact at G2
+    Login WhatsApp on G2
+
+Clear Messages on NewOne
+    NewOne.Press Menu
+    NewOne.Wait For Exists    10000    text=設定
+    NewOne.Click On    text=設定
+    NewOne.Wait For Exists    10000    text=對話設定
+    NewOne.Click On    text=對話設定
+    NewOne.Wait For Exists    10000    text=刪除所有對話
+    NewOne.Click On    text=刪除所有對話
+    NewOne.Wait For Exists    10000    text=您確定要移除所有對話並刪除其對話內容?
+    NewOne.Click On    text=OK
+    NewOne.Wait For Exists    10000    text=對話設定
+    NewOne.Press Back
+    NewOne.Press Back
+    ${conversation_exist}    NewOne.Wait For Exists    10000    text=對話
+    Should Be True    ${conversation_exist}    WhatsApp刪除訊息失敗
+
+Clear Messages on G2
+    G2.Press Menu
+    G2.Wait For Exists    10000    text=設定
+    G2.Click On    text=設定
+    G2.Wait For Exists    10000    text=對話設定
+    G2.Click On    text=對話設定
+    G2.Wait For Exists    10000    text=刪除所有對話
+    G2.Click On    text=刪除所有對話
+    G2.Wait For Exists    10000    text=您確定要移除所有對話並刪除其對話內容?
+    G2.Click On    text=OK
+    G2.Wait For Exists    10000    text=對話設定
+    G2.Press Back
+    G2.Press Back
+    ${conversation_exist}    G2.Wait For Exists    10000    text=對話
+    Should Be True    ${conversation_exist}    WhatsApp刪除訊息失敗
+
+Clear Connected Wifi on NewOne
+    NewOne.Press Home
+    NewOne.Click On    text=設定
+    NewOne.Wait For Exists    10000    textContains=Wi
+    NewOne.Click On    textContains=Wi
+    ${off}    NewOne.Wait For Exists    5000    className=android.widget.Switch    checked=false
+    Run Keyword If    ${off}    NewOne.Click On    className=android.widget.Switch    checked=false
+    NewOne.Sleep    5000
+    : FOR    ${i}    IN RANGE    ${infinite}
+    \    ${connected_exist}    NewOne.Wait For Exists    30000    text=已連線
+    \    Exit For Loop If    '${connected_exist}' == '${false}'
+    \    NewOne.Click On    text=已連線
+    \    NewOne.Wait For Exists    10000    text=中斷連線
+    \    NewOne.Click On    text=中斷連線
+    \    NewOne.Sleep    2000
+    NewOne.Click On    className=android.widget.Switch    checked=true
+    NewOne.Sleep    2000
+    NewOne.Press Home
+
+Clear Connected Wifi on G2
+    G2.Press Home
+    G2.Click On    text=設定
+    G2.Wait For Exists    10000    textContains=Wi
+    G2.Click On    textContains=Wi
+    ${off}    G2.Wait For Exists    5000    className=android.widget.Switch    text=關閉
+    Run Keyword If    ${off}    G2.Click On    className=android.widget.Switch    text=關閉
+    G2.Sleep    5000
+    : FOR    ${i}    IN RANGE    ${infinite}
+    \    ${connected_exist}    G2.Wait For Exists    30000    text=已連線
+    \    Exit For Loop If    '${connected_exist}' == '${false}'
+    \    G2.Long Click On    text=已連線
+    \    G2.Wait For Exists    10000    text=清除網路
+    \    G2.Click On    text=清除網路
+    \    G2.Sleep    2000
+    G2.Click On    className=android.widget.Switch    text=開啟
+    G2.Sleep    2000
+    G2.Press Home
+
+Clear Google Account on NewOne
+    NewOne.Press Home
+    NewOne.Click On    text=設定
+    NewOne.Wait For Exists    10000    text=帳號與同步處理
+    NewOne.Click On    textContains=Wi
+    ${off}    NewOne.Wait For Exists    5000    className=android.widget.Switch    checked=false
+    Run Keyword If    ${off}    NewOne.Click On    className=android.widget.Switch    checked=false
+    NewOne.Sleep    5000
+    : FOR    ${i}    IN RANGE    ${infinite}
+    \    ${connected_exist}    NewOne.Wait For Exists    30000    text=已連線
+    \    Exit For Loop If    '${connected_exist}' == '${false}'
+    \    NewOne.Click On    text=已連線
+    \    NewOne.Wait For Exists    10000    text=中斷連線
+    \    NewOne.Click On    text=中斷連線
+    \    NewOne.Sleep    2000
+    NewOne.Click On    className=android.widget.Switch    checked=true
+    NewOne.Sleep    2000
+    NewOne.Press Home

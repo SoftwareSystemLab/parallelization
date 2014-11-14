@@ -1,0 +1,10 @@
+*** Settings ***
+Library           Parallelization.py
+
+*** Test Cases ***
+wait
+    ${g2}    Run Async    Run Keywords    log    12345    AND    log
+    ...    54321
+    ${butterfly}    Run Async    log    987412365
+    Wait Until    ${g2}    ${butterfly}
+    [Teardown]    Stop All Async Tasks
